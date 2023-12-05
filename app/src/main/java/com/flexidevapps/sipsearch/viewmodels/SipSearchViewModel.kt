@@ -19,16 +19,15 @@ class SipSearchViewModel(
     private val cocktailApiRepository: CocktailApiRepository
 ): ViewModel() {
 
+    private val _cocktailsList: MutableLiveData<Response<Cocktails>> = MutableLiveData()
+    val cocktailsList: MutableLiveData<Response<Cocktails>> = _cocktailsList
 
-    val cocktailsList: MutableLiveData<Response<Cocktails>> = MutableLiveData()
-
-
-      fun getCocktailByName(name:String) {
+      fun getCocktailByName(name:String){
         viewModelScope.launch {
             try {
                 val response = cocktailApiRepository.searchCocktailByName(name)
                 if(response.isSuccessful) {
-                    cocktailsList.value = response
+                    _cocktailsList.value = response
                 }
             } catch (e: Exception) {
                 error("Error: ${e.message}")
@@ -36,7 +35,6 @@ class SipSearchViewModel(
             }
 
         }
-
     }
 
 }
