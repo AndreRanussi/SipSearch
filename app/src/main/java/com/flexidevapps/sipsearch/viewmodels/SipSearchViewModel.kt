@@ -1,36 +1,36 @@
 package com.flexidevapps.sipsearch.viewmodels
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.flexidevapps.sipsearch.data.api.ApiInstance
-import com.flexidevapps.sipsearch.data.api.CocktailApi
 import com.flexidevapps.sipsearch.data.api.Cocktails
-import com.flexidevapps.sipsearch.data.api.Drink
 import com.flexidevapps.sipsearch.data.repository.CocktailApiRepository
-import kotlinx.coroutines.Dispatchers
+import com.flexidevapps.sipsearch.viewmodels.viewmodelsfactory.CocktailRequestState
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import retrofit2.Response
-import retrofit2.Retrofit
 
 class SipSearchViewModel(
     private val cocktailApiRepository: CocktailApiRepository
 ): ViewModel() {
 
-    private val _cocktailsList: MutableLiveData<Response<Cocktails>> = MutableLiveData()
-    val cocktailsList: MutableLiveData<Response<Cocktails>> = _cocktailsList
+    private val _cocktailsState = mutableStateOf(CocktailRequestState())
+    val cocktailsState: State<CocktailRequestState> = _cocktailsState
 
       fun getCocktailByName(name:String){
         viewModelScope.launch {
             try {
                 val response = cocktailApiRepository.searchCocktailByName(name)
-                if(response.isSuccessful) {
-                    _cocktailsList.value = response
-                }
+                _cocktailsState.value = _cocktailsState.value.copy(
+                    loading = false,
+                    cocktailList = response.body()!!.drinks,
+                    error = null
+                  )
             } catch (e: Exception) {
-                error("Error: ${e.message}")
+                _cocktailsState.value = _cocktailsState.value.copy(
+                    loading = false,
+                    error = "Error while training to get your cocktail(s) ${e.message}"
+                )
 
             }
 
