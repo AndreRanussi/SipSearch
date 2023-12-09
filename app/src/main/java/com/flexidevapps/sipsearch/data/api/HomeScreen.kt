@@ -6,42 +6,36 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.ClickableText
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -50,25 +44,23 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.rememberAsyncImagePainter
 import com.flexidevapps.sipsearch.R
-import com.flexidevapps.sipsearch.viewmodels.SipSearchViewModel
+import com.flexidevapps.sipsearch.ui.homepage.AlphabetList
+import com.flexidevapps.sipsearch.viewmodels.HomeScreenViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -76,13 +68,19 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SipSearch(viewModel: SipSearchViewModel) {
+fun SipSearch(viewModel: HomeScreenViewModel) {
     val context = LocalContext.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val focusManager = LocalFocusManager.current
     var searchText by remember { mutableStateOf("") }
+    val VmCocktailList = viewModel.cocktailsState.value.cocktailList
     val cocktailsRequestState by viewModel.cocktailsState
     var job: Job? = null
+
+    job?.cancel()
+    LaunchedEffect(Unit) {
+        delay(500L)
+        viewModel.getCocktailByName("Margarita")
+    }
+
 
     Box(modifier = Modifier
         .fillMaxSize()
@@ -90,10 +88,6 @@ fun SipSearch(viewModel: SipSearchViewModel) {
             painterResource(id = R.drawable.main_background_image),
             contentScale = ContentScale.FillBounds
         )
-        .clickable {
-            keyboardController?.hide()
-            focusManager.clearFocus(true)
-        }
     ) {
         Column(
             Modifier
@@ -102,7 +96,7 @@ fun SipSearch(viewModel: SipSearchViewModel) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Spacer(Modifier.size(30.dp))
+            Spacer(Modifier.size(20.dp))
             Row {
                 Text(
                     text = "SipSearch",
@@ -120,7 +114,7 @@ fun SipSearch(viewModel: SipSearchViewModel) {
                 )
             }
 
-            Spacer(Modifier.size(8.dp))
+            Spacer(Modifier.size(20.dp))
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -139,16 +133,16 @@ fun SipSearch(viewModel: SipSearchViewModel) {
                         job?.cancel()
                         job = MainScope().launch {
                             delay(500L)
-                            if (it.toString().isNotEmpty()){
-                                viewModel.getCocktailByName(it)
-                            }
+                            viewModel.getCocktailByName(it)
                         }
 
                     },
-                    Icons.Outlined.Search,
+                    Icons.Default.Clear,
                     {
-                        viewModel.getCocktailByName(searchText)
-
+                        if(VmCocktailList.isNotEmpty() && searchText.isNotEmpty()) {
+                            searchText = ""
+                            viewModel.clearCocktailList()
+                            }
                     },
                     "Search Text"
                 )
@@ -166,10 +160,10 @@ fun SipSearch(viewModel: SipSearchViewModel) {
                     //Implement Filter Button action
                 }
                 Buttons("Show All") {
-                    // //Implement Show All Button action
+                    viewModel.getCocktailByName("Margarita")
                 }
                 Buttons("Random") {
-                    // //Implement Show All Button action
+                    viewModel.getRandomCocktail()
                 }
 
             }
@@ -180,41 +174,13 @@ fun SipSearch(viewModel: SipSearchViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                val alphabetList = listOf(
-                    "A",
-                    "B",
-                    "C",
-                    "D",
-                    "E",
-                    "F",
-                    "G",
-                    "H",
-                    "I",
-                    "J",
-                    "K",
-                    "L",
-                    "M",
-                    "N",
-                    "O",
-                    "P",
-                    "Q",
-                    "R",
-                    "S",
-                    "T",
-                    "U",
-                    "V",
-                    "W",
-                    "X",
-                    "Y",
-                    "Z"
-                )
-
+                val alphabetList = AlphabetList().alphabetList
 
                 items(alphabetList) { it ->
                     Text(
                         modifier = Modifier
                             .clickable {
-                                Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
+                                viewModel.searchCocktailLetter(it)
                             },
                         text = it,
                         color = Color.White
@@ -232,23 +198,42 @@ fun SipSearch(viewModel: SipSearchViewModel) {
                 modifier = Modifier
                     .fillMaxSize()
                     .border(1.dp, Color.White, shape = RoundedCornerShape(8.dp))
+                    .clip(RoundedCornerShape(8.dp))
                     .background(colorResource(id = R.color.BackgroundGreyTheme))
             )
             {
+
+
                 when {
                     cocktailsRequestState.loading -> {
-                        CircularProgressIndicator(Modifier.align(Alignment.Center))
+                        if(searchText.isEmpty()){
+                            viewModel.clearCocktailList()
+                        } else {
+                            CircularProgressIndicator(Modifier.align(Alignment.Center))
+                        }
                     }
                     cocktailsRequestState.error != null ->{
-                        Text(text = cocktailsRequestState.error!!)
+                        Text(
+                            text = cocktailsRequestState.error!!,
+                            Modifier.align(Alignment.Center),
+                            fontSize = 24.sp,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                     else ->{
-                        VerticalLazyGrid(drink = cocktailsRequestState.cocktailList)
+                        LazyVerticalGrid(
+                            GridCells.Fixed(2),
+                            Modifier
+                                .fillMaxSize(),
+                            contentPadding = PaddingValues(5.dp)
+                        ) {
+                            items(VmCocktailList) {
+                                VerticalLazyGrid(it)
+                            }
+                        }
 
                     }
-
-            }
-
+                 }
             }
         }
     }
@@ -256,15 +241,41 @@ fun SipSearch(viewModel: SipSearchViewModel) {
 }
 
 @Composable
-fun VerticalLazyGrid(drink: List<Drink> ) {
-    LazyVerticalGrid(GridCells.Fixed(2), Modifier.fillMaxSize()) {
-        items(drink){
-            Text(text = it.strDrink)
-        }
-    }
-    
-}
+fun VerticalLazyGrid(drink: Drink ) {
+    val context = LocalContext.current
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(5.dp)
+            .clip(RoundedCornerShape(5))
+            .background(colorResource(id = R.color.GreyTheme))
+            .clickable {
+                Toast
+                    .makeText(context, drink.idDrink, Toast.LENGTH_SHORT)
+                    .show()
+            }
+    ){
+        Image(
+            painter = rememberAsyncImagePainter(drink.strDrinkThumb),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(1f)
+                .border(1.dp, colorResource(id = R.color.black), shape = RoundedCornerShape(5))
+                .clip(RoundedCornerShape(5)),
+            )
 
+        Text(text = drink.strDrink,
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally),
+            color = Color.White,
+            textAlign = TextAlign.Center
+
+        )
+
+    }
+
+}
 
 @Composable
 fun Buttons(
@@ -325,7 +336,6 @@ fun OutlinedTextFieldCompose(
     labelText:String
 ) {
 
-    val context = LocalContext.current
     var isFocused by remember { mutableStateOf(false)}
 
 
@@ -351,7 +361,7 @@ fun OutlinedTextFieldCompose(
                 Text(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(colorResource(R.color.GreyTheme))
+                        .background(Color.Transparent)
                         .padding(
                             start = if (isFocused) 0.dp else 0.dp,
                             top = if (isFocused) 0.dp else 0.dp,
@@ -365,14 +375,14 @@ fun OutlinedTextFieldCompose(
             }
         },
         trailingIcon = {
-                       Icon(trailingIcon,
-                           contentDescription = null,
-                           Modifier.
-                           clickable {
-                               trailingIconClickListener.invoke()
-                           }
+            Icon(trailingIcon,
+                contentDescription = null,
+                Modifier.
+                clickable {
+                    trailingIconClickListener.invoke()
+                }
 
-                       )
+            )
         },
 
         colors = OutlinedTextFieldDefaults.colors (
@@ -386,8 +396,6 @@ fun OutlinedTextFieldCompose(
             focusedTextColor = colorResource(id = R.color.white),
             unfocusedTextColor = colorResource(id = R.color.white)
         ),
-
-
 
 
     )

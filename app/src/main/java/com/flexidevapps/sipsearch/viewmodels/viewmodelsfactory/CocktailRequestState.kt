@@ -8,5 +8,4 @@ data class CocktailRequestState(
     var cocktailList: List<Drink> = emptyList(),
     val error: String? = null
 
-
     )

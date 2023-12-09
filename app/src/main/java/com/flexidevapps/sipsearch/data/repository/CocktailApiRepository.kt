@@ -6,4 +6,8 @@ class CocktailApiRepository(private val apiInstance: ApiInstance) {
 
     suspend fun searchCocktailByName(name:String) = apiInstance.api.searchCocktailName(name)
 
+    suspend fun searchCocktailByLetter(letter:String) = apiInstance.api.searchCocktailByLetter(letter)
+
+    suspend fun getRandomCocktail() = apiInstance.api.getRandomCocktail()
+
 }

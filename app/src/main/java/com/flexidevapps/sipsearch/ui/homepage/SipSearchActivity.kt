@@ -14,14 +14,15 @@ import com.flexidevapps.sipsearch.data.api.ApiInstance
 import com.flexidevapps.sipsearch.data.api.SipSearch
 import com.flexidevapps.sipsearch.data.repository.CocktailApiRepository
 import com.flexidevapps.sipsearch.ui.theme.SipSearchTheme
-import com.flexidevapps.sipsearch.viewmodels.SipSearchViewModel
+import com.flexidevapps.sipsearch.viewmodels.HomeScreenViewModel
 import com.flexidevapps.sipsearch.viewmodels.viewmodelsfactory.SipSearchViewModelFactory
 
 class SipSearchActivity : ComponentActivity() {
         override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        installSplashScreen()
-        window.statusBarColor = getColor(R.color.black)
+            val viewModel = ViewModelProvider(this, viewModelFactoryParams()).get(HomeScreenViewModel::class.java)
+            installSplashScreen().setKeepOnScreenCondition { viewModel.cocktailsState.value.loading }
+            window.statusBarColor = getColor(R.color.black)
         window.navigationBarColor = getColor(R.color.black)
         setContent {
                 SipSearchTheme {
@@ -29,7 +30,6 @@ class SipSearchActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                      val viewModel = ViewModelProvider(this, viewModelFactoryParams()).get(SipSearchViewModel::class.java)
                       SipSearch(viewModel)
 
                 }

@@ -12,12 +12,16 @@ interface CocktailApi {
     ) : Response<Cocktails>
 
     @GET("api/json/v1/1/search.php")
-    suspend fun searchCocktailLetter(
+    suspend fun searchCocktailByLetter(
         @Query("f")letter: String
     ): Response<Cocktails>
 
     @GET("api/json/v1/1/search.php")
     suspend fun searchCocktailIngredientName(
         @Query("i")ingredient: String
+    ): Response<Cocktails>
+
+    @GET("api/json/v1/1/random.php")
+    suspend fun getRandomCocktail(
     ): Response<Cocktails>
 }
