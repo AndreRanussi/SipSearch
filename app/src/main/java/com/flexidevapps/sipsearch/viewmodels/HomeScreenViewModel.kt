@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.flexidevapps.sipsearch.data.repository.CocktailApiRepository
-import com.flexidevapps.sipsearch.viewmodels.viewmodelsfactory.CocktailRequestState
+import com.flexidevapps.sipsearch.util.CocktailRequestState
 import kotlinx.coroutines.launch
 
 class HomeScreenViewModel(
@@ -51,7 +51,6 @@ class HomeScreenViewModel(
                 )
 
             }
-
         }
     }
 

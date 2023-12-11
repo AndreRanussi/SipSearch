@@ -10,4 +10,6 @@ class CocktailApiRepository(private val apiInstance: ApiInstance) {
 
     suspend fun getRandomCocktail() = apiInstance.api.getRandomCocktail()
 
+    suspend fun getCocktailById(drinkId: String) = apiInstance.api.getCocktailById(drinkId)
+
 }

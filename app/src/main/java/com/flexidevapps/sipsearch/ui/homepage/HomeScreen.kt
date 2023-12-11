@@ -1,4 +1,4 @@
-package com.flexidevapps.sipsearch.data.api
+package com.flexidevapps.sipsearch.ui.homepage
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
@@ -42,7 +42,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.paint
@@ -59,25 +58,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.flexidevapps.sipsearch.R
-import com.flexidevapps.sipsearch.ui.homepage.AlphabetList
+import com.flexidevapps.sipsearch.data.Drink
 import com.flexidevapps.sipsearch.viewmodels.HomeScreenViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun SipSearch(viewModel: HomeScreenViewModel) {
+fun HomeScreen(
+    viewModel: HomeScreenViewModel,
+    navigationToDetailsScreen: (drinkId:String ) -> Unit
+) {
     val context = LocalContext.current
     var searchText by remember { mutableStateOf("") }
-    val VmCocktailList = viewModel.cocktailsState.value.cocktailList
+    val vmCocktailList = viewModel.cocktailsState.value.cocktailList
     val cocktailsRequestState by viewModel.cocktailsState
     var job: Job? = null
 
-    job?.cancel()
     LaunchedEffect(Unit) {
-        delay(500L)
         viewModel.getCocktailByName("Margarita")
     }
 
@@ -139,7 +138,7 @@ fun SipSearch(viewModel: HomeScreenViewModel) {
                     },
                     Icons.Default.Clear,
                     {
-                        if(VmCocktailList.isNotEmpty() && searchText.isNotEmpty()) {
+                        if(vmCocktailList.isNotEmpty() && searchText.isNotEmpty()) {
                             searchText = ""
                             viewModel.clearCocktailList()
                             }
@@ -227,8 +226,12 @@ fun SipSearch(viewModel: HomeScreenViewModel) {
                                 .fillMaxSize(),
                             contentPadding = PaddingValues(5.dp)
                         ) {
-                            items(VmCocktailList) {
-                                VerticalLazyGrid(it)
+                            items(vmCocktailList) {drink ->
+                                VerticalLazyGrid(
+                                    drink,
+                                ) {
+                                    navigationToDetailsScreen(drink.idDrink)
+                                    }
                             }
                         }
 
@@ -241,8 +244,10 @@ fun SipSearch(viewModel: HomeScreenViewModel) {
 }
 
 @Composable
-fun VerticalLazyGrid(drink: Drink ) {
-    val context = LocalContext.current
+fun VerticalLazyGrid(
+    drink: Drink,
+    navigationToDetailsScreen:() -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -250,9 +255,7 @@ fun VerticalLazyGrid(drink: Drink ) {
             .clip(RoundedCornerShape(5))
             .background(colorResource(id = R.color.GreyTheme))
             .clickable {
-                Toast
-                    .makeText(context, drink.idDrink, Toast.LENGTH_SHORT)
-                    .show()
+                navigationToDetailsScreen()
             }
     ){
         Image(

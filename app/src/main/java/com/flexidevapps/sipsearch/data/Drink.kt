@@ -1,4 +1,4 @@
-package com.flexidevapps.sipsearch.data.api
+package com.flexidevapps.sipsearch.data
 
 data class Drink(
 //    val dateModified: String,
