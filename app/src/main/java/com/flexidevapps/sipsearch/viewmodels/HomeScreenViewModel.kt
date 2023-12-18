@@ -15,6 +15,13 @@ class HomeScreenViewModel(
     private val _cocktailsState = mutableStateOf(CocktailRequestState())
     val cocktailsState: State<CocktailRequestState> = _cocktailsState
 
+    private val _searchBy = mutableStateOf("Name")
+    val searchBy: State<String> = _searchBy
+
+
+    private val _searchText = mutableStateOf("")
+    val searchText: State<String> = _searchText
+
       fun getCocktailByName(name:String){
         viewModelScope.launch {
             try {
@@ -24,6 +31,26 @@ class HomeScreenViewModel(
                     cocktailList = response.body()!!.drinks,
                     error = null
                   )
+            } catch (e: Exception) {
+                _cocktailsState.value = _cocktailsState.value.copy(
+                    loading = false,
+                    error = "No Cocktail"
+                )
+
+            }
+
+        }
+    }
+
+    fun searchCocktailIngredientName(ingredient:String){
+        viewModelScope.launch {
+            try {
+                val response = cocktailApiRepository.searchCocktailIngredientName(ingredient)
+                _cocktailsState.value = _cocktailsState.value.copy(
+                    loading = false,
+                    cocktailList = response.body()!!.drinks,
+                    error = null
+                )
             } catch (e: Exception) {
                 _cocktailsState.value = _cocktailsState.value.copy(
                     loading = false,
@@ -80,6 +107,16 @@ class HomeScreenViewModel(
             cocktailList = emptyList()
         )
     }
+
+
+    fun changeSearchInput(value:String) {
+        _searchText.value = value
+    }
+
+    fun changeSearchByInput(value:String) {
+        _searchBy.value = value
+    }
+
 
 
 }

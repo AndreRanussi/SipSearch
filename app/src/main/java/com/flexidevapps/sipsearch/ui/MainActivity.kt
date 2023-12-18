@@ -20,8 +20,8 @@ import com.flexidevapps.sipsearch.data.repository.CocktailApiRepository
 import com.flexidevapps.sipsearch.ui.cocktaildetailspage.CocktailDetailsScreen
 import com.flexidevapps.sipsearch.ui.homepage.HomeScreen
 import com.flexidevapps.sipsearch.ui.theme.SipSearchTheme
-import com.flexidevapps.sipsearch.viewmodels.HomeScreenViewModel
 import com.flexidevapps.sipsearch.viewmodels.CocktailDetailsScreenViewModel
+import com.flexidevapps.sipsearch.viewmodels.HomeScreenViewModel
 import com.flexidevapps.sipsearch.viewmodels.viewmodelsfactory.CocktailDetailsScreenViewModelFactory
 import com.flexidevapps.sipsearch.viewmodels.viewmodelsfactory.SipSearchViewModelFactory
 

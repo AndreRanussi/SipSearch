@@ -17,7 +17,7 @@ interface CocktailApi {
         @Query("f")letter: String
     ): Response<Cocktails>
 
-    @GET("api/json/v1/1/search.php")
+    @GET("api/json/v1/1/filter.php")
     suspend fun searchCocktailIngredientName(
         @Query("i")ingredient: String
     ): Response<Cocktails>

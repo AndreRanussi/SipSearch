@@ -12,4 +12,6 @@ class CocktailApiRepository(private val apiInstance: ApiInstance) {
 
     suspend fun getCocktailById(drinkId: String) = apiInstance.api.getCocktailById(drinkId)
 
+    suspend fun searchCocktailIngredientName(ingredient: String) = apiInstance.api.searchCocktailIngredientName(ingredient)
+
 }
