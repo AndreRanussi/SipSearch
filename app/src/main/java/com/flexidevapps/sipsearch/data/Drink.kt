@@ -1,17 +1,16 @@
 package com.flexidevapps.sipsearch.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 data class Drink(
-//    val dateModified: String,
     val idDrink: String,
     val strAlcoholic: String,
     val strCategory: String,
-//    val strCreativeCommonsConfirmed: String,
     val strDrink: String,
-//    val strDrinkAlternate: Any,
     val strDrinkThumb: String,
     val strGlass: String,
-//    val strIBA: String,
-//    val strImageAttribution: String,
     val strImageSource: String,
     val strIngredient1: String,
     val strIngredient2: String,
@@ -29,12 +28,6 @@ data class Drink(
     val strIngredient14: String,
     val strIngredient15: String,
     val strInstructions: String,
-//    val strInstructionsDE: String,
-//    val strInstructionsES: String,
-//    val strInstructionsFR: String,
-//    val strInstructionsIT: String,
-//    val strInstructionsZHHANS: String,
-//    val strInstructionsZHHANT: String,
     val strMeasure1: String,
     val strMeasure2: String,
     val strMeasure3: String,
@@ -50,6 +43,5 @@ data class Drink(
     val strMeasure13: String,
     val strMeasure14: String,
     val strMeasure15: String,
-//    val strTags: String,
     val strVideo: String
-)
+) : Parcelable

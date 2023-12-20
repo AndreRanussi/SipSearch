@@ -15,6 +15,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.flexidevapps.sipsearch.R
+import com.flexidevapps.sipsearch.data.Drink
 import com.flexidevapps.sipsearch.data.api.ApiInstance
 import com.flexidevapps.sipsearch.data.repository.CocktailApiRepository
 import com.flexidevapps.sipsearch.ui.cocktaildetailspage.CocktailDetailsScreen
@@ -58,14 +59,18 @@ fun MyApp(homeScreenViewModel: HomeScreenViewModel,
           ) {
     val navController = rememberNavController()
     NavHost(navController = navController, startDestination = "home-screen") {
-        composable("home-screen") {
-            HomeScreen(viewModel = homeScreenViewModel, navigationToDetailsScreen = { drinkId ->
-                navController.navigate("cocktail-details-screen/$drinkId")
+        composable(route = "home-screen", enterTransition = null, exitTransition = null
+        ) {
+            HomeScreen(viewModel = homeScreenViewModel, navigationToDetailsScreen = { drink ->
+                navController.currentBackStackEntry?.savedStateHandle?.set("drink", drink)
+                navController.navigate("cocktail-details-screen")
             })
         }
-        composable("cocktail-details-screen/{drinkId}"){
-            val drinkId = it.arguments?.getString("drinkId") ?: "No Cocktail"
-             CocktailDetailsScreen(drinkId = drinkId, viewModel = detailsScreenViewModel)
+        composable(route = "cocktail-details-screen", enterTransition = null, exitTransition = null){
+            val drink = navController.previousBackStackEntry?.savedStateHandle?.get<Drink>("drink")
+            if (drink != null) {
+                CocktailDetailsScreen(drink = drink, viewModel = detailsScreenViewModel)
+            }
         }
     }
 }

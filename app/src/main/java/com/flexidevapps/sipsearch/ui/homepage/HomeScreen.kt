@@ -75,7 +75,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     viewModel: HomeScreenViewModel,
-    navigationToDetailsScreen: (drinkId:String) -> Unit
+    navigationToDetailsScreen: (drink:Drink) -> Unit
 ) {
     val context = LocalContext.current
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -295,12 +295,16 @@ fun HomeScreen(
                                 .fillMaxSize(),
                             contentPadding = PaddingValues(5.dp)
                         ) {
-                            items(vmCocktailList) {drink ->
+                            items(
+                                items = vmCocktailList,
+                                key = { it.idDrink }
+                            ) {drink ->
                                 VerticalLazyGrid(
                                     drink,
                                 ) {
-                                    navigationToDetailsScreen(drink.idDrink)
+                                    navigationToDetailsScreen(drink)
                                     }
+
                             }
                         }
 
@@ -325,7 +329,7 @@ fun VerticalLazyGrid(
             .background(colorResource(id = R.color.GreyTheme))
             .clickable {
                 navigationToDetailsScreen()
-            }
+            },
     ){
         Image(
             painter = rememberAsyncImagePainter(drink.strDrinkThumb),

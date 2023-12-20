@@ -20,11 +20,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,43 +43,21 @@ import com.flexidevapps.sipsearch.viewmodels.CocktailDetailsScreenViewModel
 @Composable
 fun CocktailDetailsScreen(
     viewModel: CocktailDetailsScreenViewModel,
-    drinkId: String,
+    drink:Drink,
 ) {
     val cocktailsRequestState by viewModel.cocktailsState
-    val drink = viewModel.cocktailsState.value.cocktailList
     val context = LocalContext.current
-
-    LaunchedEffect(Unit) {
-        viewModel.getCocktailById(drinkId)
-    }
 
 
     Box(modifier = Modifier
         .fillMaxSize()) {
-
-        when {
-            cocktailsRequestState.loading -> {
-                CircularProgressIndicator(Modifier.align(Alignment.Center))
-            }
-            cocktailsRequestState.error != null ->{
-                Text(
-                    text = cocktailsRequestState.error!!,
-                    Modifier.align(Alignment.Center),
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-            else ->{
-                ShowCocktailDetails(drink)
-            }
-        }
+        ShowCocktailDetails(drink)
     }
 }
 
 @Composable
-fun ShowCocktailDetails(drink: List<Drink>) {
+fun ShowCocktailDetails(drink: Drink) {
     val context = LocalContext.current
-    val cocktailLst = cocktailIngredientsList(drink)
 
     Column(
         Modifier
@@ -91,7 +67,7 @@ fun ShowCocktailDetails(drink: List<Drink>) {
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = drink[0].strDrink,
+            text = drink.strDrink,
             Modifier
                 .padding(10.dp, 10.dp, 10.dp, 0.dp),
             color = Color.White,
@@ -120,7 +96,7 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                         fontWeight = FontWeight.Medium,
                     )
                     Text(
-                        text = drink[0].strGlass,
+                        text = drink.strGlass,
                         Modifier
                             .padding(10.dp, 0.dp, 0.dp, 0.dp),
                         color = Color.White,
@@ -140,9 +116,10 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                             .wrapContentWidth()
                             .padding(10.dp, 0.dp, 0.dp, 0.dp),
                     ) {
-                        for (i in cocktailLst.indices) {
+                        val ingredientList = cocktailIngredientsList(drink)
+                        for (i in ingredientList.indices) {
                             Text(
-                                text = cocktailLst[i],
+                                text = ingredientList[i],
                                 color = Color.White,
                                 fontSize = 16.sp,
                                 fontWeight = FontWeight.Normal
@@ -156,7 +133,7 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                     Modifier.fillMaxWidth()
                 ) {
                     Image(
-                        painter = rememberAsyncImagePainter(drink[0].strDrinkThumb),
+                        painter = rememberAsyncImagePainter(drink.strDrinkThumb),
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxWidth()
@@ -169,11 +146,11 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                             .clip(RoundedCornerShape(5)),
                     )
                     Spacer(Modifier.size(5.dp))
-                    if (drink[0].strVideo != null) {
+                    if (drink.strVideo != null) {
                         // Video tutorial btn
                         OutlinedButton(
                             onClick = {
-                                Toast.makeText(context, drink[0].strVideo, Toast.LENGTH_SHORT)
+                                Toast.makeText(context, drink.strVideo, Toast.LENGTH_SHORT)
                                     .show()
                             },
                             Modifier
@@ -208,7 +185,7 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                 )
 
                 Text(
-                    text = drink[0].strInstructions,
+                    text = drink.strInstructions,
                     Modifier
                         .padding(10.dp, 0.dp, 0.dp, 0.dp),
                     color = Color.White,
@@ -225,7 +202,7 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = drink[0].strCategory,
+                    text = drink.strCategory,
                     Modifier
                         .padding(10.dp, 0.dp, 0.dp, 0.dp),
                     color = Color.White,
@@ -242,7 +219,7 @@ fun ShowCocktailDetails(drink: List<Drink>) {
                     fontWeight = FontWeight.Medium,
                 )
                 Text(
-                    text = drink[0].strAlcoholic,
+                    text = drink.strAlcoholic,
                     Modifier
                         .padding(10.dp, 0.dp, 0.dp, 0.dp),
                     color = Color.White,
@@ -253,28 +230,30 @@ fun ShowCocktailDetails(drink: List<Drink>) {
         }
     }
 
-
-
-
-
-
-
-private fun cocktailIngredientsList(drink: List<Drink>) : MutableList<String> {
+private fun cocktailIngredientsList(drink: Drink): MutableList<String> {
     val ingredientList = mutableListOf<String>()
-    drink[0].strIngredient1?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure1 != null) "${drink[0].strMeasure1} of " else ""}$ingredient")}
-    drink[0].strIngredient2?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure2 != null) "${drink[0].strMeasure2} of " else ""}$ingredient")}
-    drink[0].strIngredient3?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure3 != null) "${drink[0].strMeasure3} of " else ""}$ingredient")}
-    drink[0].strIngredient4?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure4 != null) "${drink[0].strMeasure4} of "  else ""}$ingredient")}
-    drink[0].strIngredient5?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure5 != null) "${drink[0].strMeasure5} of " else ""}$ingredient")}
-    drink[0].strIngredient6?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure6 != null) "${drink[0].strMeasure6} of " else ""}$ingredient")}
-    drink[0].strIngredient7?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure7 != null) "${drink[0].strMeasure7} of " else ""}$ingredient")}
-    drink[0].strIngredient8?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure8 != null) "${drink[0].strMeasure8} of " else ""}$ingredient")}
-    drink[0].strIngredient9?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure9 != null) "${drink[0].strMeasure9} of " else ""}$ingredient")}
-    drink[0].strIngredient10?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure10 != null) "${drink[0].strMeasure10} of " else ""}$ingredient")}
-    drink[0].strIngredient11?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure11 != null) "${drink[0].strMeasure11} of " else ""}$ingredient")}
-    drink[0].strIngredient12?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure12 != null) "${drink[0].strMeasure12} of " else ""}$ingredient")}
-    drink[0].strIngredient13?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure13 != null) "${drink[0].strMeasure13} of " else ""}$ingredient")}
-    drink[0].strIngredient14?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure14 != null) "${drink[0].strMeasure14} of " else ""}$ingredient")}
-    drink[0].strIngredient15?.let {ingredient -> ingredientList.add("• ${if(drink[0].strMeasure15 != null) "${drink[0].strMeasure15} of " else ""}$ingredient")}
+
+    fun addIngredient(ingredient: String?, measure: String?) {
+        if (ingredient != null) {
+            ingredientList.add("• ${if (measure != null) "$measure of " else ""}$ingredient")
+        }
+    }
+
+    addIngredient(drink.strIngredient1, drink.strMeasure1)
+    addIngredient(drink.strIngredient2, drink.strMeasure2)
+    addIngredient(drink.strIngredient3, drink.strMeasure3)
+    addIngredient(drink.strIngredient4, drink.strMeasure4)
+    addIngredient(drink.strIngredient5, drink.strMeasure5)
+    addIngredient(drink.strIngredient6, drink.strMeasure6)
+    addIngredient(drink.strIngredient7, drink.strMeasure7)
+    addIngredient(drink.strIngredient8, drink.strMeasure8)
+    addIngredient(drink.strIngredient9, drink.strMeasure9)
+    addIngredient(drink.strIngredient10, drink.strMeasure10)
+    addIngredient(drink.strIngredient11, drink.strMeasure11)
+    addIngredient(drink.strIngredient12, drink.strMeasure12)
+    addIngredient(drink.strIngredient13, drink.strMeasure13)
+    addIngredient(drink.strIngredient14, drink.strMeasure14)
+    addIngredient(drink.strIngredient15, drink.strMeasure15)
+
     return ingredientList
 }
