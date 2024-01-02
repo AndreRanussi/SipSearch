@@ -4,9 +4,8 @@ The application also has the functionality to get a random cocktail or browse th
 <p>I chose this project to practice and deepen my understanding of how to make HTTP request using retrofit and how to create basic UI designs using jetpack compose..</p>
 
 # Application View
-<a src="app_homepage.jpg" alt="Application Screenshot"></a>
-<a src="app_details_page.jpg" alt="Application Screenshot"></a>
-
+![app_details_page.jpg](app_details_page.jpg)
+![app_homepage.jpg](app_homepage.jpg)
 
 # Project specifications
 - Kotlin
